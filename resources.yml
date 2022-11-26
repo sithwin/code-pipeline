@@ -2,7 +2,7 @@
 notesTable:
   Type: AWS::DynamoDB::Table
   Properties:
-    TableName: notes-${self:provider.stage}
+    TableName: mynote-${self:provider.stage}
     BillingMode: PAY_PER_REQUEST
     AttributeDefinitions:
       - AttributeName: notesId
@@ -10,43 +10,54 @@ notesTable:
     KeySchema:
       - AttributeName: notesId
         KeyType: HASH
-
 # Cognito user pool
 cognitoUserPool:
   Type: AWS::Cognito::UserPool
   Properties:
-    UserPoolName: MyNotesUP-${self:provider.stage}
+    UserPoolName: mynewnotepool-${self:provider.stage}
+    UsernameConfiguration:
+      CaseSensitive: false
+    AutoVerifiedAttributes:
+      - email
+    Schema:
+      - Name: email
+        AttributeDataType: String
+        Mutable: false
+        Required: true
 
 # User pool web client
-cognitoUserPoolWebclient:
+cognitoUserPoolWebClient:
   Type: AWS::Cognito::UserPoolClient
   Properties:
     UserPoolId: !Ref cognitoUserPool
     ClientName: web
-    AllowedOAuthFlowsUserPoolClient: true
-    SupportedIdentityProviders:
-      - COGNITO
+    AllowedOAuthFlowsUserPoolClient: True
+    CallbackURLs:
+      - https://example.com/callback
+    LogoutURLs:
+      - https://example.com/signout
+    AllowedOAuthFlows:
+      - code
+      - implicit
     AllowedOAuthScopes:
       - phone
       - email
-      - profile
       - openid
-    AllowedOAuthFlows:
-      - implicit
-    CallbackURLs:
-      - http://localhost:3000
+      - profile
+    SupportedIdentityProviders:
+      - COGNITO
 
 # User pool domain
-cognitoUserPoolDoamin:
+cognitoUserPoolDomain:
   Type: AWS::Cognito::UserPoolDomain
   Properties:
     UserPoolId: !Ref cognitoUserPool
-    Domain: mynotescd-${self:provider.stage}
+    Domain: mynewnotecd-${self:provider.stage}
 
 # Application parameters
-userPoolArnParam:
+userPoolArn:
   Type: AWS::SSM::Parameter
   Properties:
-    Name: /notes/${self:provider.stage}/userPoolArn
+    Name: /${self:provider.stage}/userPoolArn
     Type: String
     Value: !GetAtt cognitoUserPool.Arn
