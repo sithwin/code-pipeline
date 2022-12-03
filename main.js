@@ -33,8 +33,8 @@ async function makeCommitsForDateRange(startDate, endDate, commits) {
 }
 
 // Usage example
-const startDate = new Date('2022-11-23T12:00:00Z');
-const endDate = new Date('2022-11-23T12:00:00Z');
+const startDate = new Date('2022-12-03T12:00:00Z');
+const endDate = new Date('2022-12-05T12:00:00Z');
 const commits = [
   'Creted serverless.yml',
   'Created apis',
